@@ -975,15 +975,18 @@ _process_dir(struct cinfo *info, int base, char *path, const char *name, process
                 goto end;
             }
         } else if (de->d_type == DT_DIR) {
-            if (_process_dir(
-                    info, new_len, path, de->d_name, process_file) < 0) {
+            char dir_name[256];
+            strcpy(dir_name, de->d_name);
+            int len = strlen(dir_name);
+            dir_name[len] = '/';
+            dir_name[len + 1] = '\0';
+            if (process_file(info, new_len, path, dir_name) < 0) {
                 fprintf(stderr,
                         "ERROR: unrecoverable error parsing dir, "
                         "exit \"%s\".\n", path);
                 path[new_len - 1] = '\0';
                 r = -5;
                 goto end;
-            }
         } else if (de->d_type == DT_UNKNOWN) {
             if (_process_unknown(
                     info, new_len, path, de->d_name, process_file) < 0) {
